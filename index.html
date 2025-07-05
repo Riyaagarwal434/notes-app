@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Welcome to Cute Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: linear-gradient(135deg, #f4f0ff, #d5f7ef);
+      --btn-color: #a998d2;
+      --btn-hover: #947dc4;
+      --text-color: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Poppins', 'Quicksand', sans-serif;
+      background: var(--bg);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 40px 24px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      backdrop-filter: blur(14px);
+      animation: fadeIn 1.2s ease;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      color: var(--btn-color);
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .btn-start {
+      padding: 12px 26px;
+      font-size: 1rem;
+      border: none;
+      background: var(--btn-color);
+      color: white;
+      border-radius: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(169, 152, 210, 0.4);
+      transition: all 0.3s ease;
+      margin-top: 15px;
+    }
+
+    .btn-start:hover {
+      background: var(--btn-hover);
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    .hero-img {
+      width: 100%;
+      max-width: 320px;
+      margin-bottom: 28px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+      font-style: italic;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px 15px;
+      font-size: 1rem;
+      border: 2px solid var(--btn-color);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 300px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--btn-hover);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
+      .btn-start {
+        width: 100%;
+        font-size: 1rem;
+      }
+
+      .hero-img {
+        max-width: 260px;
+        margin-bottom: 24px;
+      }
+
+      input[type="text"] {
+        font-size: 1rem;
+      }
+
+      .container {
+        padding: 30px 18px;
+      }
+
+      footer {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <img src="img2.png" alt="Cute Notes" class="hero-img">
+    <h1 id="welcome-heading">🌼 Welcome to SleepyInk</h1>
+    <p>
+      A safe little space for your midnight musings 🌙<br>
+      Collect your quiet thoughts in soft, soothing hues. SleepyInk is notes with a hug. 🤍
+    </p>
+
+    <!-- Form to enter name -->
+    <form id="name-form" onsubmit="return saveName(event)" style="display:none;">
+      <input type="text" id="name-input" placeholder="Enter your name" required autocomplete="off" />
+      <button type="submit" class="btn-start">Save Name</button>
+    </form>
+
+    <button id="start-btn" class="btn-start" onclick="startNotes()" style="display:none;">
+      Start Writing →
+    </button>
+
+    <button id="change-name-btn" class="btn-start" onclick="showNameForm()" style="display:none; margin-top: 10px; background: #f49ac2; box-shadow: 0 6px 20px rgba(244, 154, 194, 0.4);">
+      Change Name
+    </button>
+
+    <footer>Made with stardust✨ and a hug for your thoughts💌 | © 2025 SleepyInk</footer>
+  </div>
+
+  <script>
+    const welcomeHeading = document.getElementById('welcome-heading');
+    const nameForm = document.getElementById('name-form');
+    const nameInput = document.getElementById('name-input');
+    const startBtn = document.getElementById('start-btn');
+    const changeNameBtn = document.getElementById('change-name-btn');
+
+    // Load name from localStorage on page load
+    window.onload = () => {
+      const savedName = localStorage.getItem('cuteNotesUserName');
+      if (savedName) {
+        greetUser(savedName);
+      } else {
+        askForName();
+      }
+    };
+
+    function greetUser(name) {
+      welcomeHeading.textContent = `🌼 Welcome to SleepyInk, ${name}!`;
+      nameForm.style.display = 'none';
+      startBtn.style.display = 'inline-block';
+      changeNameBtn.style.display = 'inline-block';
+    }
+
+    function askForName() {
+      welcomeHeading.textContent = `🌷 Welcome to SleepyInk`;
+      nameForm.style.display = 'block';
+      startBtn.style.display = 'none';
+      changeNameBtn.style.display = 'none';
+      nameInput.focus();
+    }
+
+    function saveName(event) {
+      event.preventDefault();
+      const enteredName = nameInput.value.trim();
+      if (enteredName) {
+        localStorage.setItem('cuteNotesUserName', enteredName);
+        greetUser(enteredName);
+      }
+    }
+
+    function showNameForm() {
+      askForName();
+      nameInput.value = '';
+    }
+
+    function startNotes() {
+      window.location.href = "notes.html";
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jot down a Cozy Note</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-light: #f5f0ff;
+      --primary-color: #a998d2;
+      --text-light: #333;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    body.dark {
+      background: #1e1e2f;
+      color: #f5f5f5;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      background: white;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    body.dark header {
+      background: #2e2e3e;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 20px;
+      color: var(--primary-color);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, select {
+      padding: 8px 12px;
+      background: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover, select:hover {
+      background: #8a7cc1;
+    }
+
+    button.btn-back {
+      background: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 12px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    button.btn-back:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 30px 24px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+      box-sizing: border-box;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 15px;
+      display: block;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .saved-msg {
+      text-align: center;
+      background: #d1ffd6;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      color: #2a8c3b;
+      display: none;
+      animation: fadeOut 2s forwards;
+      margin-bottom: 15px;
+    }
+
+    @keyframes fadeOut {
+      0%, 80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .note-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .note-actions button {
+      flex: 1 1 auto;
+      min-width: 100px;
+    }
+
+    .image-preview {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 10px;
+      display: none;
+    }
+
+    #pattern-preview {
+      margin-top: 10px;
+      height: 40px;
+      border-radius: 8px;
+      width: 100%;
+    }
+
+    canvas.confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .logo {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+
+      .actions {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .note-actions {
+        justify-content: center;
+      }
+
+      .note-actions button {
+        min-width: 80px;
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 16px;
+      }
+
+      label {
+        font-size: 14px;
+      }
+
+      input, textarea, select {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .logo {
+        font-size: 16px;
+      }
+
+      button, select {
+        font-size: 13px;
+        padding: 7px 10px;
+      }
+
+      .note-actions button {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confettiCanvas" class="confetti"></canvas>
+
+<header>
+  <div class="logo">🌸 Create a Soft Memory</div>
+  <div class="actions">
+    <button onclick="goBack()" class="btn-back">← My Notes</button>
+    <select onchange="setTheme(this.value)">
+      <option value="lavender">Lavender</option>
+      <option value="mint">Mint</option>
+      <option value="sky">Sky</option>
+    </select>
+    <button onclick="toggleDarkMode()">🌙/☀️</button>
+    <button onclick="goHome()">🏠 Home</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="saved-msg" id="savedMsg">✔ Saved!</div>
+
+  <label>Title</label>
+  <input type="text" id="note-title" placeholder="Enter a title...">
+
+  <label>My Note</label>
+  <textarea id="note-text" rows="5" placeholder="Jote Down a Cozy Note" oninput="debounceAutoSave()"></textarea>
+
+  <label>Mood Emoji</label>
+  <select id="mood">
+    <option value="">Select one...</option>
+    <option>💡 Idea</option>
+    <option>💭 Thought</option>
+    <option>📚 Study</option>
+    <option>🌞 Happy</option>
+  </select>
+
+  <label>Background Pattern</label>
+  <select id="bg-pattern" onchange="previewPattern()">
+    <option value="none">None</option>
+    <option value="dots">Dots</option>
+    <option value="stripes">Stripes</option>
+    <option value="gradient">Gradient</option>
+  </select>
+
+  <div id="pattern-preview"></div>
+
+  <label>Attach Image</label>
+  <input type="file" accept="image/*" onchange="showImage(event)" />
+  <img id="imagePreview" class="image-preview" />
+
+  <div class="note-actions">
+    <button onclick="undoText()">↩ Undo</button>
+    <button onclick="redoText()">↪ Redo</button>
+    <button onclick="saveNoteManually()">💾 Save</button>
+  </div>
+</div>
+
+<audio id="edit-sound" src="https://cdn.pixabay.com/download/audio/2022/03/21/audio_aa4a1bbd0a.mp3" preload="auto"></audio>
+<audio id="confetti-sound" src="https://cdn.pixabay.com/download/audio/2022/03/25/audio_4d5d433e9c.mp3" preload="auto"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+  let savedText = "";
+  let undoStack = [], redoStack = [];
+  const textArea = document.getElementById("note-text");
+  const titleInput = document.getElementById("note-title");
+  const moodInput = document.getElementById("mood");
+  const bgPatternInput = document.getElementById("bg-pattern");
+  const imagePreview = document.getElementById("imagePreview");
+
+  let isEditMode = false;
+  let editIndex = null;
+
+  function autoSave() {
+    const current = textArea.value;
+    if (current !== savedText) {
+      savedText = current;
+      undoStack.push(current);
+      showSavedMsg();
+      confettiBurst();
+      document.getElementById("edit-sound").play();
+    }
+  }
+
+  function debounce(func, delay) {
+    let timeout;
+    return function () {
+      clearTimeout(timeout);
+      timeout = setTimeout(func, delay);
+    };
+  }
+
+  const debounceAutoSave = debounce(autoSave, 1500);
+
+  function showSavedMsg() {
+    const msg = document.getElementById("savedMsg");
+    msg.style.display = "block";
+    setTimeout(() => msg.style.display = "none", 2000);
+  }
+
+  function undoText() {
+    if (undoStack.length > 1) {
+      redoStack.push(undoStack.pop());
+      textArea.value = undoStack[undoStack.length - 1];
+      showSavedMsg();
+    }
+  }
+
+  function redoText() {
+    if (redoStack.length > 0) {
+      const redo = redoStack.pop();
+      undoStack.push(redo);
+      textArea.value = redo;
+      showSavedMsg();
+    }
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+  }
+
+  function setTheme(theme) {
+    document.body.classList.remove("theme-lavender", "theme-mint", "theme-sky");
+    document.body.classList.add(`theme-${theme}`);
+    localStorage.setItem("theme", theme);
+  }
+
+  function loadTheme() {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) setTheme(savedTheme);
+  }
+
+  function goHome() {
+    document.getElementById("confetti-sound").play();
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 300);
+  }
+
+  function goBack() {
+    window.location.href = "notes.html";
+  }
+
+  function confettiBurst() {
+    confetti({
+      particleCount: 70,
+      spread: 90,
+      origin: { y: 0.6 }
+    });
+    document.getElementById("confetti-sound").play();
+  }
+
+  function showImage(event) {
+    const img = document.getElementById("imagePreview");
+    const file = event.target.files[0];
+    if (file) {
+      img.src = URL.createObjectURL(file);
+      img.style.display = "block";
+    }
+  }
+
+  function previewPattern() {
+    const pattern = bgPatternInput.value;
+    const preview = document.getElementById("pattern-preview");
+    if (pattern === "dots") {
+      preview.style.background = "radial-gradient(#ccc 1px, transparent 1px)";
+      preview.style.backgroundSize = "10px 10px";
+    } else if (pattern === "stripes") {
+      preview.style.background = "repeating-linear-gradient(45deg, #ccc, #ccc 5px, transparent 5px, transparent 10px)";
+    } else if (pattern === "gradient") {
+      preview.style.background = "linear-gradient(135deg, #f5f0ff, #dcf4d8)";
+    } else {
+      preview.style.background = "none";
+    }
+  }
+
+  function saveNoteManually() {
+    autoSave();
+    const notes = JSON.parse(localStorage.getItem("cuteNotes")) || [];
+
+    const newNote = {
+      title: titleInput.value,
+      text: textArea.value,
+      mood: moodInput.value,
+      bgPattern: bgPatternInput.value,
+      image: imagePreview.src || null,
+      timestamp: new Date().toLocaleString()
+    };
+
+    if (isEditMode && editIndex !== null && notes[editIndex]) {
+      notes[editIndex] = newNote;
+      localStorage.removeItem("editNoteIndex");
+    } else {
+      notes.push(newNote);
+    }
+
+    localStorage.setItem("cuteNotes", JSON.stringify(notes));
+    alert("Note saved!");
+    window.location.href = "index.html";
+  }
+
+  window.onload = () => {
+    loadTheme();
+    undoStack.push(textArea.value);
+
+    const index = localStorage.getItem("editNoteIndex");
+    if (index !== null) {
+      const notes = JSON.parse(localStorage.getItem("cuteNotes")) || [];
+      if (notes[index]) {
+        const note = notes[index];
+        titleInput.value = note.title;
+        textArea.value = note.text;
+        moodInput.value = note.mood || "";
+        bgPatternInput.value = note.bgPattern || "none";
+        if (note.image) {
+          imagePreview.src = note.image;
+          imagePreview.style.display = "block";
+        }
+        isEditMode = true;
+        editIndex = index;
+      }
+    }
+  };
+</script>
+
+</body>
+</html>

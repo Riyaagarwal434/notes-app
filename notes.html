@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-light: #f5f0ff;
+      --primary-color: #a998d2;
+      --accent: #e3dafb;
+      --note-bg: #fff;
+    }
+
+    body.theme-lavender { --bg-light: #f5f0ff; --primary-color: #a998d2; }
+    body.theme-mint     { --bg-light: #f0fff4; --primary-color: #6fcf97; }
+    body.theme-sky      { --bg-light: #f0f9ff; --primary-color: #72aee6; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-light);
+      transition: all 0.3s ease;
+    }
+
+    body.dark {
+      background: #1e1e2f;
+      color: #fff;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      border-bottom: 2px solid #ececec;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    body.dark header {
+      background: #2e2e3e;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, select {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      background: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(169, 152, 210, 0.3);
+      transition: background 0.3s ease;
+      font-size: 14px;
+    }
+
+    button:hover, select:hover {
+      background: #937fc6;
+    }
+
+    .search-bar {
+      width: 100%;
+      margin: 20px auto;
+      max-width: 600px;
+      padding: 0 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+    }
+
+    .notes-wrapper {
+      max-width: 1000px;
+      margin: 20px auto;
+      display: grid;
+      gap: 24px;
+      padding: 0 24px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .note {
+      background: var(--note-bg);
+      padding: 18px;
+      border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+      border: 2px dashed var(--accent);
+      position: relative;
+    }
+
+    .note-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .note-text {
+      font-size: 15px;
+      line-height: 1.4;
+      color: #555;
+    }
+
+    body.dark .note-text {
+      color: #ccc;
+    }
+
+    .note-meta {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    .note img {
+      max-width: 100%;
+      margin-top: 12px;
+      border-radius: 12px;
+    }
+
+    .note-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .note-actions button {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .empty-message {
+      text-align: center;
+      margin: 40px 20px;
+      font-size: 20px;
+      color: #7a6eaa;
+      background: #ebe6fa;
+      border-radius: 20px;
+      padding: 20px 30px;
+      box-shadow: 0 6px 15px rgba(121, 97, 204, 0.2);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .empty-message > span.emoji {
+      display: inline-block;
+      font-size: 28px;
+      animation: bounce 1.5s infinite ease-in-out;
+      transform-origin: center bottom;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .add-btn {
+      display: flex;
+      justify-content: center;
+      margin: 30px;
+      padding: 0 20px;
+    }
+
+    .add-btn button {
+      font-size: 16px;
+      padding: 12px 18px;
+      background: var(--primary-color);
+      border-radius: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 300px;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .logo {
+        margin-bottom: 8px;
+      }
+
+      .search-bar input {
+        font-size: 15px;
+      }
+
+      .note-title {
+        font-size: 17px;
+      }
+
+      .note-text {
+        font-size: 14px;
+      }
+
+      .add-btn button {
+        font-size: 15px;
+        padding: 10px 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .note {
+        padding: 14px;
+      }
+
+      .note-title {
+        font-size: 16px;
+      }
+
+      .note-text {
+        font-size: 13px;
+      }
+
+      .empty-message {
+        font-size: 16px;
+        padding: 16px 20px;
+      }
+
+      button, select {
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📓 My Tiny Thoughts</div>
+  <div class="actions">
+    <select onchange="setTheme(this.value)">
+      <option value="lavender">Lavender</option>
+      <option value="mint">Mint</option>
+      <option value="sky">Sky</option>
+    </select>
+    <button onclick="toggleDarkMode()">🌙/☀️</button>
+    <button onclick="goHome()">🏠 Home</button>
+  </div>
+</header>
+
+<div class="search-bar" id="searchBar">
+  <input type="text" id="searchInput" placeholder="Search your notes..." oninput="filterNotes()" />
+</div>
+
+<div class="notes-wrapper" id="notesContainer">
+  <!-- Notes will be dynamically added here -->
+</div>
+
+<div class="add-btn">
+  <button onclick="goToAddPage()">➕ Add Note</button>
+</div>
+
+<div class="empty-message" id="emptyMsg" style="display:none;">
+  <span class="emoji">😺</span> "Oops! No notes found. Maybe your brain is stuck in airplane mode?" 
+</div>
+
+<script>
+  let allNotes = [];
+
+  function loadTheme() {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) document.body.classList.add(`theme-${savedTheme}`);
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+  }
+
+  function setTheme(theme) {
+    document.body.classList.remove("theme-lavender", "theme-mint", "theme-sky");
+    document.body.classList.add(`theme-${theme}`);
+    localStorage.setItem("theme", theme);
+  }
+
+  function goHome() {
+    window.location.href = "index.html";
+  }
+
+  function goToAddPage(index = null) {
+    if (index !== null) {
+      localStorage.setItem("editNoteIndex", index);
+    } else {
+      localStorage.removeItem("editNoteIndex");
+    }
+    window.location.href = "add-note.html";
+  }
+
+  function deleteNote(index) {
+    allNotes.splice(index, 1);
+    localStorage.setItem("cuteNotes", JSON.stringify(allNotes));
+    renderNotes();
+    toggleSearchBar();
+  }
+
+  function pinNote(index) {
+    const note = allNotes.splice(index, 1)[0];
+    allNotes.unshift(note);
+    localStorage.setItem("cuteNotes", JSON.stringify(allNotes));
+    renderNotes();
+  }
+
+  function filterNotes() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = allNotes.filter(note =>
+      note.title.toLowerCase().includes(search) ||
+      note.text.toLowerCase().includes(search)
+    );
+    renderNotes(filtered);
+  }
+
+  function toggleSearchBar() {
+    const searchBar = document.getElementById("searchBar");
+    searchBar.style.display = allNotes.length > 0 ? "flex" : "none";
+  }
+
+  function renderNotes(filteredNotes = null) {
+    const notes = filteredNotes || allNotes;
+    const container = document.getElementById("notesContainer");
+    const empty = document.getElementById("emptyMsg");
+    container.innerHTML = "";
+
+    if (!filteredNotes) toggleSearchBar();
+
+    if (notes.length === 0) {
+      empty.style.display = "block";
+      return;
+    }
+
+    empty.style.display = "none";
+
+    notes.forEach((note, index) => {
+      const div = document.createElement("div");
+      div.className = "note";
+      div.innerHTML = `
+        <div class="note-actions">
+          <button title="Edit" onclick="goToAddPage(${index})">✏️</button>
+          <button title="Pin" onclick="pinNote(${index})">📌</button>
+          <button title="Delete" onclick="deleteNote(${index})">🗑️</button>
+        </div>
+        <div class="note-title">${note.mood || ""} ${note.title}</div>
+        <div class="note-text">${note.text}</div>
+        ${note.image ? `<img src="${note.image}" alt="Attached Image"/>` : ""}
+        <div class="note-meta">${note.timestamp}</div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function loadNotes() {
+    allNotes = JSON.parse(localStorage.getItem("cuteNotes")) || [];
+    renderNotes();
+    toggleSearchBar();
+  }
+
+  window.onload = () => {
+    loadTheme();
+    loadNotes();
+  };
+</script>
+
+</body>
+</html>
